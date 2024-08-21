@@ -1,0 +1,14 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>設定</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
+      <mat-form-field appearance="outline">
+        <mat-label>質問の数</mat-label>
+        <input matInput formControlName="numberOfQuestions" type="number" min="1" required>
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit">保存</button>
+    </form>
+  </mat-card-content>
+</mat-card>

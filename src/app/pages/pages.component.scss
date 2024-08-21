@@ -1,0 +1,22 @@
+.page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.content-container {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+}
+
+.side-menu {
+  width: 250px;
+  background-color: #f0f4f7;
+}
+
+.main-content {
+  flex: 1;
+//   padding: 20px;
+  background-color: #fff;
+}

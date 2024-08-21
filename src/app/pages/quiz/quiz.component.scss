@@ -1,0 +1,72 @@
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+mat-card {
+  max-width: 1000px;
+  margin: 0px auto;
+  padding: 20px;
+}
+
+mat-card-header {
+  background-color: #ffe6e6;
+}
+
+mat-card-title {
+  font-size: 1.5rem;
+  color: #ff6666;
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+mat-card-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+mat-card-actions button {
+  flex-grow: 1;
+  margin: 0 5px;
+  color: black;
+}
+
+img {
+  display: block;
+  margin: 0 auto;
+  width: 240px;
+}
+
+.primaryButton {
+  color: white;
+  background-color: rgb(5, 180, 255);
+}
+
+.warnButton {
+  background-color: red;
+}
+
+.accentButton {
+  background-color: green;
+}
+
+.tertiaryButton {
+  background-color: yellow;
+}
+
+.game-over {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 24px;
+  color: red;
+}
+
+.game-over button {
+  background-color: rgb(5, 180, 255);
+  color: black;
+}

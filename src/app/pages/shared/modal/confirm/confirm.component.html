@@ -1,0 +1,4 @@
+<h1 mat-dialog-title class="mat-dialog-title"
+  [ngClass]="{ 'correct-answer': data.isCorrect, 'wrong-answer': !data.isCorrect }">
+  {{ data.isCorrect ? 'せいかい' : 'ふせいかい' }}
+</h1>

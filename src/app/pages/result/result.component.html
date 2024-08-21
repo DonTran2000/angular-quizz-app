@@ -1,0 +1,38 @@
+<div class="title">
+  <h1>成績</h1>
+</div>
+
+<table mat-table [dataSource]="results" class="mat-elevation-z8">
+
+  <ng-container matColumnDef="image">
+    <th mat-header-cell *matHeaderCellDef>  </th>
+    <td mat-cell *matCellDef="let result">
+      <img *ngIf="result.image" [src]="result.image" alt="Pokemon Image" style="width: 50px; height: auto;">
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="question">
+    <th mat-header-cell *matHeaderCellDef> 問題 </th>
+    <td mat-cell *matCellDef="let result"> {{ result.question }} </td>
+  </ng-container>
+  
+  <ng-container matColumnDef="selectedAnswer">
+    <th mat-header-cell *matHeaderCellDef> 回答 </th>
+    <td mat-cell *matCellDef="let result"> {{ result.selectedAnswer }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="correctAnswer">
+    <th mat-header-cell *matHeaderCellDef> 正解 </th>
+    <td mat-cell *matCellDef="let result"> {{ result.correctAnswer }} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="result">
+    <th mat-header-cell *matHeaderCellDef> </th>
+    <td mat-cell *matCellDef="let result">
+      {{ result.selectedAnswer === result.correctAnswer ? '🟢' : '❌' }}
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+</table>
