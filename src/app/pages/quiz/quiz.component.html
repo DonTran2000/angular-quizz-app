@@ -2,18 +2,14 @@
   <mat-spinner></mat-spinner>
 </div>
 
-<div *ngIf="quizCompleted" class="game-over">
-  <h1>ゲームが終了します</h1>
-  <p>あなたのスコア: {{ score }}/{{ maxQuestions }}</p>
-  <button mat-button (click)="restartGame()">再スタート</button>
-</div>
-
 <div *ngIf="!isLoading">
-  <div *ngIf="!quizCompleted">
-    <mat-card *ngIf="!quizCompleted">
+  <!-- abilities -->
+  <div *ngIf="questionType === 'abilities'">
+    <mat-card>
       <mat-card-header>
         <div mat-card-avatar class="example-header-image"></div>
         <mat-card-title>Q{{ questionNumber }}.{{ question }}</mat-card-title>
+        <button mat-button (click)="toggleHint()">ヒント</button>
       </mat-card-header>
       <mat-card-content>
         <img *ngIf="no" [src]="'assets/images/pokemon/' + no + '.png'" alt="{{name}}">
@@ -31,8 +27,63 @@
             <input matInput formControlName="evolutions" readonly>
           </mat-form-field>
         </form>
+        <!-- Gợi ý (hint) -->
+        <p *ngIf="showHint" class="hint-text" [innerHTML]="hint"></p>
       </mat-card-content>
+      <mat-card-actions>
+        <button mat-button *ngFor="let answer of answers; let i = index"
+          [ngClass]="buttonClasses[i % buttonClasses.length]" (click)="register(answer)">
+          {{ answer }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
 
+  <!-- types -->
+  <div *ngIf="questionType === 'types'">
+    <mat-card>
+      <mat-card-header>
+        <div mat-card-avatar class="example-header-image"></div>
+        <mat-card-title>Q{{ questionNumber }}.{{ question }}</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <img *ngIf="no" [src]="'assets/images/pokemon/' + no + '.png'" alt="{{name}}">
+        <form [formGroup]="form">
+          <mat-form-field appearance="outline">
+            <mat-label>名前</mat-label>
+            <input matInput formControlName="name" readonly>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>とくせい</mat-label>
+            <input matInput formControlName="abilities" readonly>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>進化</mat-label>
+            <input matInput formControlName="evolutions" readonly>
+          </mat-form-field>
+        </form>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button *ngFor="let answer of answers; let i = index"
+          [ngClass]="buttonClasses[i % buttonClasses.length]" (click)="register(answer)">
+          {{ answer }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+  <!-- name -->
+  <div *ngIf="questionType === 'name'">
+    <mat-card>
+      <mat-card-header>
+        <div mat-card-avatar class="example-header-image"></div>
+        <mat-card-title>Q{{ questionNumber }}.{{ question }}</mat-card-title>
+        <button mat-button (click)="toggleHint()">ヒント</button>
+      </mat-card-header>
+      <mat-card-content>
+        <img *ngIf="no" [src]="'assets/images/pokemon/' + no + '.png'" alt="{{name}}">
+        <!-- Gợi ý (hint) -->
+        <p *ngIf="showHint" class="hint-text"> {{hint}} </p>
+      </mat-card-content>
       <mat-card-actions>
         <button mat-button *ngFor="let answer of answers; let i = index"
           [ngClass]="buttonClasses[i % buttonClasses.length]" (click)="register(answer)">

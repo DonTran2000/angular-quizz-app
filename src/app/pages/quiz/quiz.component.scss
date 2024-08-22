@@ -8,11 +8,17 @@
 mat-card {
   max-width: 1000px;
   margin: 0px auto;
-  padding: 20px;
+  padding: 10px;
 }
 
 mat-card-header {
   background-color: #ffe6e6;
+}
+
+mat-card-header button {
+  margin-left: 40%;
+  color: blue;
+  background-color: aqua;
 }
 
 mat-card-title {
@@ -59,14 +65,7 @@ img {
   background-color: yellow;
 }
 
-.game-over {
-  text-align: center;
-  margin-top: 20px;
-  font-size: 24px;
-  color: red;
-}
-
-.game-over button {
-  background-color: rgb(5, 180, 255);
-  color: black;
+.hint-text {
+  color: gray;
+  font-style: italic;
 }

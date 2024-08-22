@@ -13,10 +13,12 @@ import { SettingsService } from '../settings.service';
   styleUrls: ['./quiz.component.scss']
 })
 export class QuizComponent implements OnInit {
+  showHint: boolean = false;
+  hint: string = '';
+
   questionNumber: number = 1;
   maxQuestions: number = 3;
   score: number = 0;
-  quizCompleted: boolean = false;
 
   no?: string = '';
   name?: string;
@@ -27,6 +29,8 @@ export class QuizComponent implements OnInit {
   correctAnswer?: string;
   resultMessage?: string;
   currentQuestion?: any;
+  questionType?: string;
+  abilities?: string[];
 
   quizResults: any[] = [];
 
@@ -45,9 +49,9 @@ export class QuizComponent implements OnInit {
   ) {
     this.form = this.fb.group({
       name: [''],
-      english_name: [''],
       types: [''],
-      evolutions: ['']
+      evolutions: [''],
+      abilities: ['']
     });
   }
 
@@ -59,12 +63,18 @@ export class QuizComponent implements OnInit {
     this.loadData();
   }
 
-  private formatNumberToThreeDigits(no: number): string {
+  private formatNumberToThreeDigits(no: string): string {
     return no.toString().padStart(3, '0'); // Chuyển số thành chuỗi và thêm số 0 vào đầu cho đủ 3 chữ số
   }
 
   loadNextQuestion() {
+    debugger
     this.dataService.loadDataAndGenerateQuestion().subscribe(questionData => {
+      debugger
+      if (questionData.no === undefined) {
+        this.loadGeneratePokemonQuestion();
+      }
+
       this.no = this.formatNumberToThreeDigits(questionData.no);
       this.question = questionData.question;
       this.answers = questionData.answers;
@@ -72,13 +82,51 @@ export class QuizComponent implements OnInit {
       this.types = questionData.types;
       this.evolutions = questionData.evolutions.length ? questionData.evolutions : ["しない"];
       this.correctAnswer = questionData.correctAnswer;
+      this.questionType = questionData.questionType;
+
+      // vì questionType === 'abilities' không có abilities, nên if
+      if (this.questionType === 'types') {
+        this.abilities = questionData.abilities;
+      }
+
+      if (this.questionType === 'abilities' || this.questionType === 'name') {
+        this.hint = questionData.hint;
+      }
 
       this.form.patchValue({
         name: this.name,
         types: this.types?.join(', '),
-        evolutions: this.evolutions?.join(', ')
+        evolutions: this.evolutions?.join(', '),
+        abilities: this.abilities?.join(', ')
       });
     });
+  }
+
+  loadGeneratePokemonQuestion() {
+    this.dataService.generatePokemonQuestion().then((questionData) => {
+      debugger
+      this.no = questionData.no;
+
+      this.question = questionData.question;
+      this.answers = questionData.answers;
+      this.name = questionData.correctAnswer;
+      this.correctAnswer = questionData.correctAnswer;
+      this.questionType = questionData.questionType;
+      this.hint = questionData.hint;
+
+      this.form.patchValue({
+        name: this.name || '',
+        types: this.types?.join(', ') || '',
+        evolutions: this.evolutions?.join(', ') || '',
+        abilities: this.abilities?.join(', ') || ''
+      });
+    }).catch((err) => {
+      console.error('Failed to generate question:', err);
+      // Thực hiện xử lý lỗi tùy theo yêu cầu của ứng dụng
+    });
+  }
+  toggleHint() {
+    this.showHint = !this.showHint; // Hiển thị hoặc ẩn gợi ý
   }
 
   loadData() {
@@ -114,18 +162,12 @@ export class QuizComponent implements OnInit {
     }, 1000);
   }
 
-  endGame() {
-    this.quizCompleted = true;
-  }
-
   completeQuiz() {
-    this.endGame();
     localStorage.setItem('quizResults', JSON.stringify(this.quizResults));
     this.router.navigate(['/results']);
   }
 
   restartGame() {
-    this.quizCompleted = false;
     this.score = 0;
     this.questionNumber = 1;
     this.quizResults = []; // Xóa kết quả cũ khi bắt đầu trò chơi mới

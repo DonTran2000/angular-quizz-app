@@ -18,7 +18,6 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Tải cài đặt hiện tại (nếu có)
     this.settingsService.getSettings().subscribe(settings => {
       this.settingsForm.patchValue(settings);
     });

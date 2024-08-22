@@ -1,6 +1,7 @@
 import { Injectable, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { catchError, from, map, Observable, of } from 'rxjs';
+import { PokemonClient } from 'pokenode-ts';
 
 @Injectable({
   providedIn: 'root'
@@ -16,36 +17,110 @@ export class DataService {
   }
 
 
-  generateQuestion(): { no: number; question: string; answers: string[], name: string, types: string[], evolutions: string[]; correctAnswer: string } | null {
+  generateAbilitiesQuestion(): {
+    no: string;
+    question: string;
+    answers: string[],
+    name: string,
+    types: string[],
+    evolutions: string[];
+    correctAnswer: string;
+    questionType: string;
+    hint: string
+  } | null {
     debugger
     const pokemon = this.getRandomPokemon();
-    const correctAnswer = this.getCorrectAnswer(pokemon);
-    const dummyOptions = this.getDummyOptions(correctAnswer);
-    const answers = this.shuffleAnswers([correctAnswer, ...dummyOptions]);
+    const correctAnswer = this.getCorrectAnswerAbilities(pokemon);
+    const dummyAbilitiesOptions = this.getDummyAbilitiesOptions(correctAnswer);
+    const answers = this.shuffleAnswers([correctAnswer, ...dummyAbilitiesOptions]);
 
     return {
       no: pokemon.no,
-      question: `${pokemon.name}のとくせいは？`,
+      question: `このポケモンのとくせいは？`,
       name: pokemon.name,
       types: pokemon.types,
       evolutions: pokemon.evolutions,
       answers: answers,
-      correctAnswer: correctAnswer
+      correctAnswer: correctAnswer,
+      questionType: 'abilities',
+      hint: `ヒント: この能力は、<b>${pokemon.types.join(', ')}</b> タイプのポケモンによく見られます。`
     };
+  }
+
+  generateTypeQuestion(): { no: string; question: string; answers: string[], name: string, abilities: string[], evolutions: string[], correctAnswer: string; questionType: string } | null {
+    debugger
+    const pokemon = this.getRandomPokemon();
+    const correctAnswer = pokemon.types[0];
+    const dummyTypesOptions = this.getDummyTypesOptions(correctAnswer);
+    const answers = this.shuffleAnswers([correctAnswer, ...dummyTypesOptions]);
+
+    return {
+      no: pokemon.no,
+      question: `このポケモンのタイプは？`,
+      name: pokemon.name,
+      evolutions: pokemon.evolutions,
+      abilities: pokemon.abilities,
+      answers: answers,
+      correctAnswer: correctAnswer,
+      questionType: 'types'
+    };
+  }
+
+  async generatePokemonQuestion(): Promise<{ no: string; question: string; hint: string; answers: string[]; correctAnswer: string; questionType: string | undefined; }> {
+    debugger
+    const pokemonFromJS = this.getRandomPokemon();
+    const id = pokemonFromJS.no;
+    const japaneseName = pokemonFromJS.name;
+    const dummyNameOptions = this.getDummyNameOptions(japaneseName);
+    const answers = this.shuffleAnswers([japaneseName, ...dummyNameOptions]);
+    let hint = "";
+
+    const api = new PokemonClient();
+    const pokemonData = await api.getPokemonById(id);
+    console.log(pokemonData.id);
+    const englishName = pokemonData.name;
+    console.log(englishName);
+
+    hint = `ヒント: このポケモンの名前は英語で「${englishName}」です。`;
+    return {
+      no: id,
+      question: `このポケモンの名前はなんですか？`,
+      hint: hint,
+      answers: answers,
+      correctAnswer: japaneseName,
+      questionType: 'name'
+    };
+
   }
 
   private getRandomPokemon(): any {
     return this.data[Math.floor(Math.random() * this.data.length)];
   }
 
-  private getCorrectAnswer(pokemon: any): string {
+  private getCorrectAnswerAbilities(pokemon: any): string {
     return pokemon.abilities[0];
   }
 
-  private getDummyOptions(correctAnswer: string): string[] {
+  private getDummyAbilitiesOptions(correctAnswer: string): string[] {
     return this.data
       .map(p => p.abilities)
       .filter(ability => ability !== correctAnswer)
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 3);
+  }
+
+  private getDummyTypesOptions(correctAnswer: string): string[] {
+    return this.data
+      .map(p => p.types)
+      .filter(types => types !== correctAnswer)
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 3);
+  }
+
+  private getDummyNameOptions(japaneseName: string): string[] {
+    return this.data
+      .map(p => p.name)
+      .filter(name => name !== japaneseName)
       .sort(() => 0.5 - Math.random())
       .slice(0, 3);
   }
@@ -54,13 +129,26 @@ export class DataService {
     return answers.sort(() => 0.5 - Math.random());
   }
 
-  loadDataAndGenerateQuestion(): Observable<{ no: number; question: string; answers: string[]; name: string; types: string[]; evolutions: string[]; correctAnswer: string }> {
+  loadDataAndGenerateQuestion(): Observable<any> {
     return this.getData().pipe(
       map(data => {
         this.data = data;
-        const questionData = this.generateQuestion();
-        return questionData || { no: NaN, question: 'No question available', answers: [], name: '', types: [], evolutions: [], correctAnswer: '' };
+        const questionData = this.generateRandomQuestion();
+        return questionData || from(this.generatePokemonQuestion());
       })
     );
   }
+
+  generateRandomQuestion() {
+    const questionTypes = [
+      this.generateAbilitiesQuestion.bind(this),
+      this.generateTypeQuestion.bind(this),
+      this.generatePokemonQuestion.bind(this),
+      // Add more question types here
+    ];
+
+    const randomIndex = Math.floor(Math.random() * questionTypes.length);
+    return questionTypes[randomIndex]();
+  }
+
 }
