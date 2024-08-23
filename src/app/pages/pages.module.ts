@@ -23,6 +23,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ResultComponent } from './result/result.component';
 import { MatTableModule } from '@angular/material/table';
 import { SettingsComponent } from './settings/settings.component';
+import { MatSelectModule } from '@angular/material/select';
+
 
 
 @NgModule({
@@ -50,6 +52,7 @@ import { SettingsComponent } from './settings/settings.component';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatTableModule,
+    MatSelectModule,
   ],
   exports: [
     HeaderComponent,

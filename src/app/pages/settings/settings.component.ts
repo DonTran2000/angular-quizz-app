@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { SettingsService } from '../settings.service';
 
@@ -10,21 +10,24 @@ import { SettingsService } from '../settings.service';
 })
 export class SettingsComponent implements OnInit {
   settingsForm: FormGroup;
+  questionTypeOptions: string[] = ['abilities', 'types', 'name'];
 
   constructor(private fb: FormBuilder, private settingsService: SettingsService, private router: Router) {
+    debugger
     this.settingsForm = this.fb.group({
-      numberOfQuestions: [3] // Giá trị mặc định là 3 câu hỏi
+      numberOfQuestions: [3, [Validators.required, Validators.min(1)]],
+      questionTypes: [this.questionTypeOptions, [Validators.required]]
     });
   }
 
   ngOnInit(): void {
     this.settingsService.getSettings().subscribe(settings => {
+      debugger
       this.settingsForm.patchValue(settings);
     });
   }
 
   saveSettings(): void {
-    // Lưu cài đặt và chuyển đến trang quiz
     this.settingsService.saveSettings(this.settingsForm.value).subscribe(() => {
       this.router.navigate(['/quiz']);
     });

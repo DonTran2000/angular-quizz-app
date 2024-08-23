@@ -1,14 +1,34 @@
+<div class="title">
+  <h1>設定</h1>
+</div>
+
 <mat-card>
-  <mat-card-header>
-    <mat-card-title>設定</mat-card-title>
-  </mat-card-header>
   <mat-card-content>
     <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()">
+
       <mat-form-field appearance="outline">
         <mat-label>質問の数</mat-label>
         <input matInput formControlName="numberOfQuestions" type="number" min="1" required>
       </mat-form-field>
+
       <br>
+
+      <mat-form-field appearance="outline">
+        <mat-label>質問の種類</mat-label>
+        <mat-select formControlName="questionTypes" multiple>
+          <mat-option *ngFor="let type of questionTypeOptions" [value]="type">
+            <ng-container [ngSwitch]="type">
+              <span *ngSwitchCase="'abilities'">とくせい</span>
+              <span *ngSwitchCase="'name'">名前</span>
+              <span *ngSwitchCase="'types'">タイプ</span>
+              <span *ngSwitchDefault>{{ type }}</span>
+            </ng-container>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <br>
+
       <button mat-raised-button color="primary" type="submit">保存</button>
     </form>
   </mat-card-content>

@@ -18,6 +18,8 @@ export class QuizComponent implements OnInit {
 
   questionNumber: number = 1;
   maxQuestions: number = 3;
+  questionTypes!: string[];
+  settingQuestionType: string = '';
   score: number = 0;
 
   no?: string = '';
@@ -58,7 +60,9 @@ export class QuizComponent implements OnInit {
   ngOnInit(): void {
     // Lấy số lượng câu hỏi từ SettingsService
     this.settingsService.settings$.subscribe(settings => {
+      debugger
       this.maxQuestions = settings.numberOfQuestions;
+      this.questionTypes = settings.questionTypes;
     });
     this.loadData();
   }
@@ -67,64 +71,65 @@ export class QuizComponent implements OnInit {
     return no.toString().padStart(3, '0'); // Chuyển số thành chuỗi và thêm số 0 vào đầu cho đủ 3 chữ số
   }
 
+  private getRandomQuestionType(): string {
+    debugger
+    const randomIndex = Math.floor(Math.random() * this.questionTypes.length);
+    return this.questionTypes[randomIndex];
+  }
+
   loadNextQuestion() {
     debugger
-    this.dataService.loadDataAndGenerateQuestion().subscribe(questionData => {
-      debugger
-      if (questionData.no === undefined) {
+    this.settingQuestionType = this.getRandomQuestionType(); // Lấy loại câu hỏi ngẫu nhiên
+
+    this.dataService.loadDataAndGenerateQuestion(this.settingQuestionType).subscribe(questionData => {
+      if (this.settingQuestionType === 'name') {
         this.loadGeneratePokemonQuestion();
+        return;
       }
-
-      this.no = this.formatNumberToThreeDigits(questionData.no);
-      this.question = questionData.question;
-      this.answers = questionData.answers;
-      this.name = questionData.name;
-      this.types = questionData.types;
-      this.evolutions = questionData.evolutions.length ? questionData.evolutions : ["しない"];
-      this.correctAnswer = questionData.correctAnswer;
-      this.questionType = questionData.questionType;
-
-      // vì questionType === 'abilities' không có abilities, nên if
-      if (this.questionType === 'types') {
-        this.abilities = questionData.abilities;
-      }
-
-      if (this.questionType === 'abilities' || this.questionType === 'name') {
+      if (this.settingQuestionType === 'abilities' || this.settingQuestionType === 'types') {
+        this.no = this.formatNumberToThreeDigits(questionData.no);
+        this.question = questionData.question;
+        this.answers = questionData.answers;
+        this.name = questionData.name;
+        this.types = questionData.types;
+        this.evolutions = questionData.evolutions.length ? questionData.evolutions : ["しない"];
+        this.correctAnswer = questionData.correctAnswer;
+        this.questionType = questionData.questionType;
         this.hint = questionData.hint;
-      }
 
-      this.form.patchValue({
-        name: this.name,
-        types: this.types?.join(', '),
-        evolutions: this.evolutions?.join(', '),
-        abilities: this.abilities?.join(', ')
-      });
+        if (this.questionType === 'types') {
+          this.abilities = questionData.abilities;
+        }
+
+        this.form.patchValue({
+          name: this.name,
+          types: this.types?.join(', '),
+          evolutions: this.evolutions?.join(', '),
+          abilities: this.abilities?.join(', ')
+        });
+      } else {
+        // Nếu câu hỏi không đúng loại, tải lại câu hỏi
+        this.loadNextQuestion();
+      }
     });
   }
 
   loadGeneratePokemonQuestion() {
     this.dataService.generatePokemonQuestion().then((questionData) => {
       debugger
-      this.no = questionData.no;
-
+      this.no = this.formatNumberToThreeDigits(questionData.no);
+      console.log(this.no);
       this.question = questionData.question;
       this.answers = questionData.answers;
       this.name = questionData.correctAnswer;
       this.correctAnswer = questionData.correctAnswer;
       this.questionType = questionData.questionType;
-      this.hint = questionData.hint;
 
-      this.form.patchValue({
-        name: this.name || '',
-        types: this.types?.join(', ') || '',
-        evolutions: this.evolutions?.join(', ') || '',
-        abilities: this.abilities?.join(', ') || ''
-      });
     }).catch((err) => {
       console.error('Failed to generate question:', err);
-      // Thực hiện xử lý lỗi tùy theo yêu cầu của ứng dụng
     });
   }
+
   toggleHint() {
     this.showHint = !this.showHint; // Hiển thị hoặc ẩn gợi ý
   }

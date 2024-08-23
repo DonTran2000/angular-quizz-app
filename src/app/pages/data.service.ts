@@ -10,6 +10,8 @@ export class DataService {
   data: any[] = [];
   urlData: string = '/assets/data/pokemon_data.json';
 
+  isFirstQuestionLoaded: boolean = true;
+
   constructor(private http: HttpClient) { }
 
   getData() {
@@ -66,31 +68,34 @@ export class DataService {
     };
   }
 
-  async generatePokemonQuestion(): Promise<{ no: string; question: string; hint: string; answers: string[]; correctAnswer: string; questionType: string | undefined; }> {
+  async generatePokemonQuestion(): Promise<{ no: string; question: string; answers: string[]; correctAnswer: string; questionType: string }> {
     debugger
+
+    if (this.isFirstQuestionLoaded) {
+      this.isFirstQuestionLoaded = false;
+      return { no: '', question: '', answers: [], correctAnswer: '', questionType: '' };
+    }
+
     const pokemonFromJS = this.getRandomPokemon();
     const id = pokemonFromJS.no;
     const japaneseName = pokemonFromJS.name;
     const dummyNameOptions = this.getDummyNameOptions(japaneseName);
     const answers = this.shuffleAnswers([japaneseName, ...dummyNameOptions]);
-    let hint = "";
 
     const api = new PokemonClient();
     const pokemonData = await api.getPokemonById(id);
-    console.log(pokemonData.id);
     const englishName = pokemonData.name;
-    console.log(englishName);
 
-    hint = `ヒント: このポケモンの名前は英語で「${englishName}」です。`;
+    // trừ trường hợp sẽ bị gọi lại Question về name pokemon
+    this.isFirstQuestionLoaded = true;
+
     return {
       no: id,
-      question: `このポケモンの名前はなんですか？`,
-      hint: hint,
+      question: `このポケモンの英語名は '${englishName}' ですが、日本語では何ですか？`,
       answers: answers,
       correctAnswer: japaneseName,
       questionType: 'name'
     };
-
   }
 
   private getRandomPokemon(): any {
@@ -129,16 +134,6 @@ export class DataService {
     return answers.sort(() => 0.5 - Math.random());
   }
 
-  loadDataAndGenerateQuestion(): Observable<any> {
-    return this.getData().pipe(
-      map(data => {
-        this.data = data;
-        const questionData = this.generateRandomQuestion();
-        return questionData || from(this.generatePokemonQuestion());
-      })
-    );
-  }
-
   generateRandomQuestion() {
     const questionTypes = [
       this.generateAbilitiesQuestion.bind(this),
@@ -149,6 +144,42 @@ export class DataService {
 
     const randomIndex = Math.floor(Math.random() * questionTypes.length);
     return questionTypes[randomIndex]();
+  }
+
+  generateQuestionByType(type: string): Promise<any> | any {
+    debugger
+    switch (type) {
+      case 'abilities':
+        return this.generateAbilitiesQuestion();
+      case 'types':
+        return this.generateTypeQuestion();
+      case 'name':
+        return this.generatePokemonQuestion();
+      default:
+        return null;
+    }
+  }
+
+  loadDataAndGenerateQuestion(types: string): Observable<any> {
+    return this.getData().pipe(
+      map(data => {
+        this.data = data;
+        const abilitiesQuestion = 'abilities';
+        const typesTypeQuestion = 'types';
+        const nameQuestion = 'name';
+
+        if (types === 'abilities') {
+          const questionData = this.generateQuestionByType(abilitiesQuestion);
+          return questionData;
+        } else if (types === 'types') {
+          const questionData = this.generateQuestionByType(typesTypeQuestion);
+          return questionData;
+        } else if (types === 'name') {
+          const questionData = this.generateQuestionByType(nameQuestion);
+          return questionData;
+        }
+      }),
+    );
   }
 
 }

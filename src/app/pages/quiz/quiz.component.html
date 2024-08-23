@@ -11,6 +11,7 @@
         <mat-card-title>Q{{ questionNumber }}.{{ question }}</mat-card-title>
         <button mat-button (click)="toggleHint()">ヒント</button>
       </mat-card-header>
+
       <mat-card-content>
         <img *ngIf="no" [src]="'assets/images/pokemon/' + no + '.png'" alt="{{name}}">
         <form [formGroup]="form">
@@ -27,15 +28,16 @@
             <input matInput formControlName="evolutions" readonly>
           </mat-form-field>
         </form>
-        <!-- Gợi ý (hint) -->
         <p *ngIf="showHint" class="hint-text" [innerHTML]="hint"></p>
       </mat-card-content>
+
       <mat-card-actions>
         <button mat-button *ngFor="let answer of answers; let i = index"
           [ngClass]="buttonClasses[i % buttonClasses.length]" (click)="register(answer)">
           {{ answer }}
         </button>
       </mat-card-actions>
+
     </mat-card>
   </div>
 
@@ -46,6 +48,7 @@
         <div mat-card-avatar class="example-header-image"></div>
         <mat-card-title>Q{{ questionNumber }}.{{ question }}</mat-card-title>
       </mat-card-header>
+
       <mat-card-content>
         <img *ngIf="no" [src]="'assets/images/pokemon/' + no + '.png'" alt="{{name}}">
         <form [formGroup]="form">
@@ -63,33 +66,40 @@
           </mat-form-field>
         </form>
       </mat-card-content>
+
       <mat-card-actions>
         <button mat-button *ngFor="let answer of answers; let i = index"
           [ngClass]="buttonClasses[i % buttonClasses.length]" (click)="register(answer)">
           {{ answer }}
         </button>
       </mat-card-actions>
+
     </mat-card>
   </div>
+
   <!-- name -->
   <div *ngIf="questionType === 'name'">
     <mat-card>
       <mat-card-header>
         <div mat-card-avatar class="example-header-image"></div>
         <mat-card-title>Q{{ questionNumber }}.{{ question }}</mat-card-title>
+      </mat-card-header>
+
+      <mat-card-header>
         <button mat-button (click)="toggleHint()">ヒント</button>
       </mat-card-header>
+
       <mat-card-content>
-        <img *ngIf="no" [src]="'assets/images/pokemon/' + no + '.png'" alt="{{name}}">
-        <!-- Gợi ý (hint) -->
-        <p *ngIf="showHint" class="hint-text"> {{hint}} </p>
+        <img *ngIf="showHint" [src]="'assets/images/pokemon/' + no + '.png'" alt="{{name}}">
       </mat-card-content>
+
       <mat-card-actions>
         <button mat-button *ngFor="let answer of answers; let i = index"
           [ngClass]="buttonClasses[i % buttonClasses.length]" (click)="register(answer)">
           {{ answer }}
         </button>
       </mat-card-actions>
+
     </mat-card>
   </div>
 </div>
