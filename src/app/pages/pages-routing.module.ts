@@ -11,13 +11,18 @@ const routes: Routes = [
     component: PagesComponent,
     children: [
       {
+        path: '',
+        redirectTo: 'quiz',
+        pathMatch: 'full'
+      },
+      {
         path: 'quiz',
         component: QuizComponent
       },
       {
         path: 'results',
         component: ResultComponent
-      },{
+      }, {
         path: 'settings',
         component: SettingsComponent
       },
