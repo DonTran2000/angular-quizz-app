@@ -1,5 +1,14 @@
 <mat-toolbar color="primary">
-    <span>ポケモンクイズ</span>
-    <span class="spacer"></span>
-    <button mat-button>トップ</button>
+  <span>ポケモンクイズ</span>
+  <span class="spacer"></span>
+
+  <ng-container *ngIf="user">
+    <img [src]="user.picture" alt="User Image" class="user-img">
+    <span>{{ user.email }}</span>
+    <button mat-button (click)="logout()">Logout</button>
+  </ng-container>
+
+  <ng-container *ngIf="!user">
+    <button mat-button routerLink="/login">Login</button>
+  </ng-container>
 </mat-toolbar>

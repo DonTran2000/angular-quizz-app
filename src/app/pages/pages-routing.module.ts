@@ -4,17 +4,18 @@ import { PagesComponent } from './pages.component';
 import { QuizComponent } from './quiz/quiz.component';
 import { ResultComponent } from './result/result.component';
 import { SettingsComponent } from './settings/settings.component';
+import { LoginComponent } from './login/login.component';
 
 const routes: Routes = [
   {
     path: '',
     component: PagesComponent,
     children: [
-      {
-        path: '',
-        redirectTo: 'quiz',
-        pathMatch: 'full'
-      },
+      // {
+      //   path: '',
+      //   redirectTo: 'quiz',
+      //   pathMatch: 'full'
+      // },
       {
         path: 'quiz',
         component: QuizComponent
@@ -22,9 +23,14 @@ const routes: Routes = [
       {
         path: 'results',
         component: ResultComponent
-      }, {
+      },
+      {
         path: 'settings',
         component: SettingsComponent
+      },
+      {
+        path: '',
+        component: LoginComponent
       },
       {
         path: 'hoge',

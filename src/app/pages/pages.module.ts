@@ -24,6 +24,7 @@ import { ResultComponent } from './result/result.component';
 import { MatTableModule } from '@angular/material/table';
 import { SettingsComponent } from './settings/settings.component';
 import { MatSelectModule } from '@angular/material/select';
+import { LoginComponent } from './login/login.component';
 
 
 
@@ -37,6 +38,7 @@ import { MatSelectModule } from '@angular/material/select';
     QuizComponent,
     ResultComponent,
     SettingsComponent,
+    LoginComponent,
   ],
   imports: [
     CommonModule,
